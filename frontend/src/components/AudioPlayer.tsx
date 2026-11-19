@@ -17,16 +17,22 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const [rate, setRate] = useState<number>(1.0);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
-  const [supported, setSupported] = useState(true);
+  const [supported] = useState(() => typeof window !== 'undefined' && 'speechSynthesis' in window);
   const [progressPercent, setProgressPercent] = useState<number>(0);
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  useEffect(() => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      setSupported(false);
-      return;
+  const handleStop = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
+    setIsPlaying(false);
+    setIsPaused(false);
+    setProgressPercent(0);
+  };
+
+  useEffect(() => {
+    if (!supported) return;
 
     const updateVoices = () => {
       const voices = window.speechSynthesis.getVoices();
@@ -52,11 +58,18 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         window.speechSynthesis.cancel();
       }
     };
-  }, []);
+  }, [supported]);
 
-  useEffect(() => {
-    handleStop();
-  }, [script]);
+  const [prevScript, setPrevScript] = useState(script);
+  if (script !== prevScript) {
+    setPrevScript(script);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsPlaying(false);
+    setIsPaused(false);
+    setProgressPercent(0);
+  }
 
   const handlePlay = () => {
     if (!supported || !script) return;
@@ -115,14 +128,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     }
   };
 
-  const handleStop = () => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    setIsPlaying(false);
-    setIsPaused(false);
-    setProgressPercent(0);
-  };
+
 
   const handleRateChange = (newRate: number) => {
     setRate(newRate);

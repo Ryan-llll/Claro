@@ -89,7 +89,7 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({
         const data = await res.json();
         setErrorMessage(data.error || 'Failed to save key');
       }
-    } catch (err) {
+    } catch {
       setErrorMessage('Could not connect to backend to save key.');
     } finally {
       setSavingKey(false);

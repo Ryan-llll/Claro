@@ -38,44 +38,7 @@ export function App() {
     }
   }, [isDarkMode]);
 
-  // Automatically load the latest processed lecture if available on mount
-  useEffect(() => {
-    fetch('/api/digests')
-      .then((res) => res.json())
-      .then((list) => {
-        if (Array.isArray(list) && list.length > 0) {
-          handleSelectCachedDigest(list[0].id);
-        }
-      })
-      .catch((e) => console.warn('Could not fetch initial digests:', e));
-  }, []);
 
-  // Keyboard navigation for study modes (keys 1, 2, 3)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
-      if (e.key === '1') {
-        if (digest) {
-          setMode('esl');
-          setShowUpload(false);
-        }
-      } else if (e.key === '2') {
-        if (digest) {
-          setMode('adhd');
-          setShowUpload(false);
-        }
-      } else if (e.key === '3') {
-        if (digest) {
-          setMode('dyslexia');
-          setShowUpload(false);
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [digest]);
 
   const handleDigestLoaded = (newDigest: DigestResponse) => {
     setDigest(newDigest);
@@ -122,6 +85,47 @@ export function App() {
       console.warn('Delete failed:', e)
     );
   };
+
+  // Automatically load the latest processed lecture if available on mount
+  useEffect(() => {
+    fetch('/api/digests')
+      .then((res) => res.json())
+      .then((list) => {
+        if (Array.isArray(list) && list.length > 0) {
+          handleSelectCachedDigest(list[0].id);
+        }
+      })
+      .catch((e) => console.warn('Could not fetch initial digests:', e));
+  }, []);
+
+  // Keyboard navigation for study modes (keys 1, 2, 3)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      if (e.key === '1') {
+        if (digest) {
+          setMode('esl');
+          setShowUpload(false);
+        }
+      } else if (e.key === '2') {
+        if (digest) {
+          setMode('adhd');
+          setShowUpload(false);
+        }
+      } else if (e.key === '3') {
+        if (digest) {
+          setMode('dyslexia');
+          setShowUpload(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [digest]);
+
+
 
   const handleAuthSuccess = (authenticatedUser: AuthUser) => {
     setUser(authenticatedUser);

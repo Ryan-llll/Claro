@@ -22,16 +22,24 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      setLoading(true);
-      fetch('/api/digests')
-        .then((res) => (res.ok ? res.json() : []))
-        .then((data) => {
+    if (!isOpen) return;
+    let ignore = false;
+    fetch('/api/digests')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (!ignore) {
           setLectureList(data);
-        })
-        .catch((e) => console.warn('Could not load history:', e))
-        .finally(() => setLoading(false));
-    }
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        console.warn('Could not load history:', e);
+        if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, [isOpen]);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {

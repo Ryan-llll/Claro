@@ -14,12 +14,14 @@ export const AdhdFocusView: React.FC<AdhdFocusViewProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [prevIndex, setPrevIndex] = useState(currentIndex);
+
+  if (currentIndex !== prevIndex) {
+    setPrevIndex(currentIndex);
+    setRevealed(false);
+  }
 
   const currentCard = cards[currentIndex] || cards[0];
-
-  useEffect(() => {
-    setRevealed(false);
-  }, [currentIndex]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
