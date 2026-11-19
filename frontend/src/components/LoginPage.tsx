@@ -68,7 +68,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           </div>
           <div>
             <h1 className="font-extrabold text-lg tracking-tight leading-none">Claro</h1>
-            <span className="text-[10px] text-cyan-400 font-semibold tracking-wide">كلارو</span>
           </div>
         </div>
 
