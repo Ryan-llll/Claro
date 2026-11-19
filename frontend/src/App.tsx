@@ -8,7 +8,7 @@ import { AudioPlayer } from './components/AudioPlayer';
 import { UploadPanel } from './components/UploadPanel';
 import { HistoryModal } from './components/HistoryModal';
 import { AuthModal, type AuthUser } from './components/AuthModal';
-import { FileText, ArrowLeft, Sparkles } from 'lucide-react';
+import { FileText, ArrowLeft, Sparkles, Trash2 } from 'lucide-react';
 
 export function App() {
   const [digest, setDigest] = useState<DigestResponse | null>(null);
@@ -95,6 +95,27 @@ export function App() {
       console.warn('Failed to load digest:', e);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteLecture = async (id: string) => {
+    try {
+      const res = await fetch(`/api/digests/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        if (digest?.id === id) {
+          setDigest(null);
+          setShowUpload(true);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to delete lecture:', e);
+    }
+  };
+
+  const handleDeleteCurrentLecture = () => {
+    if (!digest) return;
+    if (window.confirm(`Are you sure you want to delete "${digest.title}"?`)) {
+      handleDeleteLecture(digest.id);
     }
   };
 
@@ -233,15 +254,26 @@ export function App() {
                     {digest.title}
                   </h1>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowUpload(true)}
-                    className={`text-xs font-bold hover:underline underline-offset-4 flex-shrink-0 ${
-                      isDarkMode ? 'text-cyan-400' : 'text-blue-600'
-                    }`}
-                  >
-                    Change file
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowUpload(true)}
+                      className={`text-xs font-bold hover:underline underline-offset-4 flex-shrink-0 ${
+                        isDarkMode ? 'text-cyan-400' : 'text-blue-600'
+                      }`}
+                    >
+                      Change file
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteCurrentLecture}
+                      className="text-xs font-medium text-slate-400 hover:text-rose-400 flex items-center gap-1 transition-colors"
+                      title="Delete this course"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Subtle Filename */}
@@ -300,6 +332,8 @@ export function App() {
         isOpen={showHistory}
         onClose={() => setShowHistory(false)}
         onSelectLecture={handleSelectCachedDigest}
+        onDeleteLecture={handleDeleteLecture}
+        activeDigestId={digest?.id}
         isDarkMode={isDarkMode}
       />
 

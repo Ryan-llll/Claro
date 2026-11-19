@@ -33,19 +33,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'esl' as AccessibilityMode,
       label: 'Darija & French',
       icon: Languages,
-      keyNum: '1',
     },
     {
       id: 'adhd' as AccessibilityMode,
       label: 'Flashcards',
       icon: Zap,
-      keyNum: '2',
     },
     {
       id: 'dyslexia' as AccessibilityMode,
       label: 'Dyslexia & Audio',
       icon: Headphones,
-      keyNum: '3',
     },
   ];
 
@@ -105,16 +102,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? isDarkMode ? 'text-cyan-400' : 'text-blue-600' : isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} />
                     <span className="truncate">{item.label}</span>
                   </div>
-                  {/* 1, 2, 3 Badges */}
-                  <span
-                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                      isActive
-                        ? isDarkMode ? 'bg-cyan-500/20 text-cyan-300' : 'bg-blue-100 text-blue-700'
-                        : isDarkMode ? 'bg-[#0B0D10] text-slate-500 border border-[#222731]' : 'bg-slate-100 text-slate-500'
-                    }`}
-                  >
-                    {item.keyNum}
-                  </span>
                 </button>
               );
             })}

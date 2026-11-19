@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { X, FileText, ChevronRight } from 'lucide-react';
+import { X, FileText, ChevronRight, Trash2 } from 'lucide-react';
 
 interface HistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectLecture: (id: string) => void;
+  onDeleteLecture?: (id: string) => void;
+  activeDigestId?: string;
   isDarkMode: boolean;
 }
 
@@ -12,10 +14,13 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   isOpen,
   onClose,
   onSelectLecture,
+  onDeleteLecture,
+  activeDigestId,
   isDarkMode,
 }) => {
   const [lectureList, setLectureList] = useState<{ id: string; fileName: string; title: string; createdAt: string }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -29,6 +34,24 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
         .finally(() => setLoading(false));
     }
   }, [isOpen]);
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this lecture?')) return;
+
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/digests/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setLectureList((prev) => prev.filter((item) => item.id !== id));
+        onDeleteLecture?.(id);
+      }
+    } catch (err) {
+      console.warn('Failed to delete lecture:', err);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -62,36 +85,60 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
               Loading lectures...
             </div>
           ) : lectureList.length > 0 ? (
-            lectureList.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  onSelectLecture(item.id);
-                  onClose();
-                }}
-                className={`w-full text-left p-4 rounded-2xl border transition-all group flex items-center justify-between ${
-                  isDarkMode
-                    ? 'border-[#222731] hover:border-cyan-400/50 hover:bg-[#181D26]'
-                    : 'border-slate-200 hover:border-blue-500 hover:bg-slate-50'
-                }`}
-              >
-                <div className="min-w-0 pr-3">
-                  <h4 className={`font-semibold text-xs truncate group-hover:text-cyan-400 transition-colors ${
-                    isDarkMode ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    {item.title}
-                  </h4>
-                  <p className={`text-[11px] truncate flex items-center gap-1.5 mt-0.5 ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
-                    <FileText className="w-3 h-3 opacity-60" />
-                    {item.fileName}
-                  </p>
+            lectureList.map((item) => {
+              const isActive = activeDigestId === item.id;
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => {
+                    onSelectLecture(item.id);
+                    onClose();
+                  }}
+                  className={`w-full text-left p-3.5 sm:p-4 rounded-2xl border transition-all group flex items-center justify-between cursor-pointer ${
+                    isActive
+                      ? isDarkMode
+                        ? 'border-cyan-500/50 bg-[#181D26]'
+                        : 'border-blue-400 bg-blue-50/50'
+                      : isDarkMode
+                      ? 'border-[#222731] hover:border-cyan-400/50 hover:bg-[#181D26]'
+                      : 'border-slate-200 hover:border-blue-500 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="min-w-0 pr-3 flex-1">
+                    <h4 className={`font-semibold text-xs truncate group-hover:text-cyan-400 transition-colors ${
+                      isActive ? 'text-cyan-300' : isDarkMode ? 'text-white' : 'text-slate-900'
+                    }`}>
+                      {item.title}
+                    </h4>
+                    <p className={`text-[11px] truncate flex items-center gap-1.5 mt-0.5 ${
+                      isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                    }`}>
+                      <FileText className="w-3 h-3 opacity-60 flex-shrink-0" />
+                      <span className="truncate">{item.fileName}</span>
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {/* Delete button */}
+                    <button
+                      type="button"
+                      onClick={(e) => handleDelete(e, item.id)}
+                      disabled={deletingId === item.id}
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        isDarkMode
+                          ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10'
+                          : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'
+                      }`}
+                      title="Delete lecture"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 transition" />
+                  </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 transition flex-shrink-0" />
-              </button>
-            ))
+              );
+            })
           ) : (
             <div className="text-center py-8 text-slate-400 text-xs">
               No previous lectures found.

@@ -241,6 +241,23 @@ app.get('/api/digests/:id', async (req: Request, res: Response) => {
 });
 
 /**
+ * Delete a specific digest by ID
+ */
+app.delete('/api/digests/:id', async (req: Request, res: Response) => {
+  try {
+    const id = String(req.params.id);
+    await prisma.digest.delete({
+      where: { id },
+    });
+    console.log(`[API] 🗑️ Deleted digest ID: ${id}`);
+    return res.json({ success: true, message: 'Lecture deleted successfully' });
+  } catch (error) {
+    console.error('[API] Error deleting digest:', error);
+    return res.status(500).json({ error: 'Failed to delete lecture' });
+  }
+});
+
+/**
  * Main Digest Generation / Cache Endpoint
  */
 app.post('/api/digest', upload.single('file'), async (req: Request, res: Response) => {
