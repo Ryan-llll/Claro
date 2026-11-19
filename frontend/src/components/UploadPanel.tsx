@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { UploadCloud, AlertCircle, Sparkles, Key, Check, ExternalLink } from 'lucide-react';
 import type { DigestResponse } from '../types';
+import { apiUrl } from '../api';
 
 interface UploadPanelProps {
   onDigestLoaded: (digest: DigestResponse) => void;
@@ -29,7 +30,7 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({
 
   // Check if Gemini key is set in backend
   useEffect(() => {
-    fetch('/api/settings/status')
+    fetch(apiUrl('/api/settings/status'))
       .then((res) => res.json())
       .then((data) => {
         setHasGeminiKey(Boolean(data.hasKey));
@@ -68,7 +69,7 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({
 
     setSavingKey(true);
     try {
-      const res = await fetch('/api/settings/key', {
+      const res = await fetch(apiUrl('/api/settings/key'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ apiKey: inputApiKey.trim() }),
@@ -115,7 +116,7 @@ export const UploadPanel: React.FC<UploadPanelProps> = ({
       formData.append('file', file);
 
       setLoadingStep('Calling Gemini AI to generate translations & flashcards...');
-      const response = await fetch('/api/digest', {
+      const response = await fetch(apiUrl('/api/digest'), {
         method: 'POST',
         body: formData,
       });

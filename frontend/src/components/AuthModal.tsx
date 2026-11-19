@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Sparkles, User, Mail, Lock, ArrowRight, Check } from 'lucide-react';
+import { apiUrl } from '../api';
 
 export interface AuthUser {
   id: string;
@@ -36,7 +37,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setSuccessMsg(null);
     setLoading(true);
 
-    const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+    const endpoint = isRegister ? apiUrl('/api/auth/register') : apiUrl('/api/auth/login');
     const body = isRegister ? { name, email, password } : { email, password };
 
     try {

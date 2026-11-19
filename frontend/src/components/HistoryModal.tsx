@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, FileText, ChevronRight, Trash2 } from 'lucide-react';
+import { apiUrl } from '../api';
 
 interface HistoryModalProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     let ignore = false;
-    fetch('/api/digests')
+    fetch(apiUrl('/api/digests'))
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         if (!ignore) {
@@ -49,7 +50,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
     onDeleteLecture?.(id);
 
     try {
-      await fetch(`/api/digests/${id}`, { method: 'DELETE' });
+      await fetch(apiUrl(`/api/digests/${id}`), { method: 'DELETE' });
     } catch (err) {
       console.warn('Failed to delete lecture:', err);
     }

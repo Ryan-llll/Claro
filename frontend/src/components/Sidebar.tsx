@@ -1,7 +1,7 @@
 import React from 'react';
 import type { AccessibilityMode } from '../types';
 import type { AuthUser } from './AuthModal';
-import { Languages, Zap, Headphones, UploadCloud, FolderOpen, Sun, Moon, Sparkles, User, LogOut } from 'lucide-react';
+import { Languages, Zap, Headphones, UploadCloud, FolderOpen, Sun, Moon, Sparkles, User } from 'lucide-react';
 
 interface SidebarProps {
   currentMode: AccessibilityMode;
@@ -13,7 +13,6 @@ interface SidebarProps {
   isUploadView: boolean;
   user: AuthUser | null;
   onOpenAuth: () => void;
-  onSignOut: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -26,7 +25,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isUploadView,
   user,
   onOpenAuth,
-  onSignOut,
 }) => {
   const modes = [
     {
@@ -152,9 +150,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }`}>
         {/* Account Button (Left of theme toggle) */}
         {user ? (
-          <div className={`flex-1 min-w-0 flex items-center justify-between px-2.5 py-1.5 rounded-xl border ${
-            isDarkMode ? 'bg-[#161B23] border-[#222731]' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
+          <button
+            type="button"
+            onClick={onOpenAuth}
+            className={`flex-1 min-w-0 flex items-center justify-between px-2.5 py-1.5 rounded-xl border transition-all text-left ${
+              isDarkMode ? 'bg-[#161B23] hover:bg-[#1D222D] border-[#222731]' : 'bg-white hover:bg-slate-100 border-slate-200 shadow-sm'
+            }`}
+            title="View Account & Settings"
+          >
             <div className="flex items-center gap-2 min-w-0">
               <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 text-white font-bold text-[10px] flex items-center justify-center flex-shrink-0 shadow-sm">
                 {user.name.charAt(0).toUpperCase()}
@@ -163,15 +166,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {user.name}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={onSignOut}
-              className="p-1 rounded-lg text-slate-400 hover:text-rose-400 transition-colors ml-1"
-              title="Sign Out"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          </div>
+            <span className="text-[10px] text-cyan-400 font-bold ml-1 flex-shrink-0">Account</span>
+          </button>
         ) : (
           <button
             type="button"
@@ -183,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
           >
             <User className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-            <span className="truncate">Account</span>
+            <span className="truncate">Sign In</span>
           </button>
         )}
 

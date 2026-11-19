@@ -8,7 +8,10 @@ import { AudioPlayer } from './components/AudioPlayer';
 import { UploadPanel } from './components/UploadPanel';
 import { HistoryModal } from './components/HistoryModal';
 import { AuthModal, type AuthUser } from './components/AuthModal';
+import { LoginPage } from './components/LoginPage';
+import { AccountModal } from './components/AccountModal';
 import { FileText, ArrowLeft, Sparkles, Trash2 } from 'lucide-react';
+import { apiUrl } from './api';
 
 export function App() {
   const [digest, setDigest] = useState<DigestResponse | null>(null);
@@ -17,6 +20,8 @@ export function App() {
   const [showUpload, setShowUpload] = useState<boolean>(true);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [showAuth, setShowAuth] = useState<boolean>(false);
+  const [showAccountModal, setShowAccountModal] = useState<boolean>(false);
+  const [isGuest, setIsGuest] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
   // Current authenticated user (persisted in localStorage)
@@ -48,7 +53,7 @@ export function App() {
   const handleSelectCachedDigest = async (id: string) => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/digests/${id}`);
+      const res = await fetch(apiUrl(`/api/digests/${id}`));
       if (res.ok) {
         const data = await res.json();
         setDigest(data);
@@ -68,7 +73,7 @@ export function App() {
       setShowUpload(true);
     }
     try {
-      await fetch(`/api/digests/${id}`, { method: 'DELETE' });
+      await fetch(apiUrl(`/api/digests/${id}`), { method: 'DELETE' });
     } catch (e) {
       console.warn('Failed to delete lecture from server:', e);
     }
@@ -81,14 +86,14 @@ export function App() {
     setDigest(null);
     setShowUpload(true);
     // Delete in background
-    fetch(`/api/digests/${currentId}`, { method: 'DELETE' }).catch((e) =>
+    fetch(apiUrl(`/api/digests/${currentId}`), { method: 'DELETE' }).catch((e) =>
       console.warn('Delete failed:', e)
     );
   };
 
   // Automatically load the latest processed lecture if available on mount
   useEffect(() => {
-    fetch('/api/digests')
+    fetch(apiUrl('/api/digests'))
       .then((res) => res.json())
       .then((list) => {
         if (Array.isArray(list) && list.length > 0) {
@@ -138,12 +143,25 @@ export function App() {
 
   const handleSignOut = () => {
     setUser(null);
+    setIsGuest(false);
+    setShowAccountModal(false);
     try {
       localStorage.removeItem('claro_user');
     } catch (e) {
       console.warn('Could not remove user:', e);
     }
   };
+
+  if (!user && !isGuest) {
+    return (
+      <LoginPage
+        onAuthSuccess={handleAuthSuccess}
+        onContinueAsGuest={() => setIsGuest(true)}
+        isDarkMode={isDarkMode}
+        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+      />
+    );
+  }
 
   return (
     <div className={`min-h-screen flex flex-col md:flex-row transition-colors duration-200 ${
@@ -168,8 +186,7 @@ export function App() {
         onToggleTheme={() => setIsDarkMode(!isDarkMode)}
         isUploadView={showUpload || !digest}
         user={user}
-        onOpenAuth={() => setShowAuth(true)}
-        onSignOut={handleSignOut}
+        onOpenAuth={() => (user ? setShowAccountModal(true) : setShowAuth(true))}
       />
 
       {/* 2. Main Content Container */}
@@ -352,6 +369,17 @@ export function App() {
         onAuthSuccess={handleAuthSuccess}
         isDarkMode={isDarkMode}
       />
+
+      {/* Account Details & Settings Modal */}
+      {user && (
+        <AccountModal
+          isOpen={showAccountModal}
+          onClose={() => setShowAccountModal(false)}
+          user={user}
+          onSignOut={handleSignOut}
+          isDarkMode={isDarkMode}
+        />
+      )}
     </div>
   );
 }
