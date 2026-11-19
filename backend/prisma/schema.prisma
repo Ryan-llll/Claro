@@ -1,0 +1,31 @@
+// Prisma Schema for Claro
+// Accessible study platform with PostgreSQL caching and user accounts
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  digests   Digest[]
+}
+
+model Digest {
+  id        String   @id @default(uuid())
+  fileHash  String   @unique
+  fileName  String
+  title     String
+  payload   Json
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}

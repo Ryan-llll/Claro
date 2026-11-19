@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B0D10"/>
+      <stop offset="100%" stop-color="#161B23"/>
+    </linearGradient>
+    <linearGradient id="starGrad" x1="16" y1="12" x2="48" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+  </defs>
+  <!-- Background rounded squircle -->
+  <rect width="64" height="64" rx="18" fill="url(#bgGrad)"/>
+  <rect x="1" y="1" width="62" height="62" rx="17" stroke="#222731" stroke-width="2"/>
+  
+  <!-- Primary 4-pointed Star -->
+  <path d="M32 12 C32 23 23 32 12 32 C23 32 32 41 32 52 C32 41 41 32 52 32 C41 32 32 23 32 12 Z" fill="url(#starGrad)"/>
+  
+  <!-- Top Right Small Sparkle -->
+  <path d="M46 14 C46 18.5 42.5 22 38 22 C42.5 22 46 25.5 46 30 C46 25.5 49.5 22 54 22 C49.5 22 46 18.5 46 14 Z" fill="#38BDF8"/>
+  
+  <!-- Bottom Left Tiny Sparkle -->
+  <path d="M18 42 C18 44.5 16 46.5 13.5 46.5 C16 46.5 18 48.5 18 51 C18 48.5 20 46.5 22.5 46.5 C20 46.5 18 44.5 18 42 Z" fill="#38BDF8" opacity="0.8"/>
+</svg>
