@@ -241,12 +241,12 @@ app.get('/api/digests/:id', async (req: Request, res: Response) => {
 });
 
 /**
- * Delete a specific digest by ID
+ * Delete a specific digest by ID (safe deleteMany prevents P2025 errors)
  */
 app.delete('/api/digests/:id', async (req: Request, res: Response) => {
   try {
     const id = String(req.params.id);
-    await prisma.digest.delete({
+    await prisma.digest.deleteMany({
       where: { id },
     });
     console.log(`[API] 🗑️ Deleted digest ID: ${id}`);
@@ -254,6 +254,20 @@ app.delete('/api/digests/:id', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('[API] Error deleting digest:', error);
     return res.status(500).json({ error: 'Failed to delete lecture' });
+  }
+});
+
+/**
+ * Clear all digests
+ */
+app.delete('/api/digests', async (_req: Request, res: Response) => {
+  try {
+    await prisma.digest.deleteMany({});
+    console.log('[API] 🗑️ Cleared all digests');
+    return res.json({ success: true, message: 'All lectures cleared successfully' });
+  } catch (error) {
+    console.error('[API] Error clearing digests:', error);
+    return res.status(500).json({ error: 'Failed to clear lectures' });
   }
 });
 

@@ -20,7 +20,6 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
 }) => {
   const [lectureList, setLectureList] = useState<{ id: string; fileName: string; title: string; createdAt: string }[]>([]);
   const [loading, setLoading] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -37,19 +36,14 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this lecture?')) return;
+    // Instantly remove from list for immediate snappy feedback
+    setLectureList((prev) => prev.filter((item) => item.id !== id));
+    onDeleteLecture?.(id);
 
-    setDeletingId(id);
     try {
-      const res = await fetch(`/api/digests/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setLectureList((prev) => prev.filter((item) => item.id !== id));
-        onDeleteLecture?.(id);
-      }
+      await fetch(`/api/digests/${id}`, { method: 'DELETE' });
     } catch (err) {
       console.warn('Failed to delete lecture:', err);
-    } finally {
-      setDeletingId(null);
     }
   };
 
@@ -123,7 +117,6 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                     <button
                       type="button"
                       onClick={(e) => handleDelete(e, item.id)}
-                      disabled={deletingId === item.id}
                       className={`p-1.5 rounded-lg transition-colors ${
                         isDarkMode
                           ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10'

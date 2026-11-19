@@ -99,24 +99,28 @@ export function App() {
   };
 
   const handleDeleteLecture = async (id: string) => {
+    // Instantly reset the active lecture view
+    if (!digest || digest.id === id) {
+      setDigest(null);
+      setShowUpload(true);
+    }
     try {
-      const res = await fetch(`/api/digests/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        if (digest?.id === id) {
-          setDigest(null);
-          setShowUpload(true);
-        }
-      }
+      await fetch(`/api/digests/${id}`, { method: 'DELETE' });
     } catch (e) {
-      console.warn('Failed to delete lecture:', e);
+      console.warn('Failed to delete lecture from server:', e);
     }
   };
 
   const handleDeleteCurrentLecture = () => {
     if (!digest) return;
-    if (window.confirm(`Are you sure you want to delete "${digest.title}"?`)) {
-      handleDeleteLecture(digest.id);
-    }
+    const currentId = digest.id;
+    // Instantly remove from screen
+    setDigest(null);
+    setShowUpload(true);
+    // Delete in background
+    fetch(`/api/digests/${currentId}`, { method: 'DELETE' }).catch((e) =>
+      console.warn('Delete failed:', e)
+    );
   };
 
   const handleAuthSuccess = (authenticatedUser: AuthUser) => {
