@@ -1,4 +1,4 @@
-# Claro (كلارو) — Inclusive Multilingual Study Platform
+# Claro  — Inclusive Multilingual Study Platform
 
 > **Built for the neoCedrus Hackathon (neoHack) at Al Akhawayn University (AUI)**  
 > **Theme:** "Tech for Inclusivity"  
