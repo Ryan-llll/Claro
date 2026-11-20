@@ -70,7 +70,7 @@ function extractPptxSlideImages(buffer: Buffer): SlideImage[] {
 
     for (const rel of relEntries) {
       const content = rel.getData().toString('utf-8');
-      const matches = [...content.matchAll(/Target=\"([^\"]+\.(?:png|jpe?g))\"/gi)];
+      const matches = [...content.matchAll(/Target="([^"]+\.(?:png|jpe?g))"/gi)];
       
       let bestEntry: any = null;
       let bestSize = 0;

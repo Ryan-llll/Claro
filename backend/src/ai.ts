@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { GlossaryTerm, MicroCard, DigestResponse } from './types.js';
-import { ExtractedDocument, SlideImage } from './parser.js';
+import { DigestResponse } from './types.js';
+import { ExtractedDocument } from './parser.js';
 
 const SYSTEM_PROMPT = `You are an inclusive university learning assistant helping Moroccan university students (French-Baccalaureate freshmen transitioning to English, ADHD learners, and dyslexic students).
 
